@@ -1,12 +1,30 @@
 import 'package:calculator/colors.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'login_screen.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(MaterialApp(
     home: CalculatorApp(),
   ));
-
+}
+class Login extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Calculator App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: LoginScreen(),
+    );
+  }
 }
 
 class CalculatorApp extends StatefulWidget {
