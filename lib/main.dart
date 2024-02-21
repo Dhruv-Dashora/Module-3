@@ -22,7 +22,7 @@ class Login extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(),
+      home: Login(),
     );
   }
 }

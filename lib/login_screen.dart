@@ -1,45 +1,129 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors
-
 import 'package:flutter/material.dart';
-import 'package:calculator/main.dart';
+import 'package:calculator/SignIn.dart';
 
 
-class  LoginScreen extends StatelessWidget {
+class LoginForm extends StatefulWidget {
+  const LoginForm({super.key});
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  String email = '';
+  String password = '';
+  String fullname = '';
+  bool login = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        elevation: 0,
+        title: const Text('Login'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton.icon(
-              onPressed: () {
-                // Add your Google login logic here
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CalculatorApp()),
-                );
-              },
-              icon: Icon(Icons.mail),
-              label: Text('Login via Google'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () {
-                // Add your Email login logic here
+      body: Form(
+        key: _formKey,
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ======== Full Name ========
+              login
+                  ? Container()
+                  : TextFormField(
+                key: const ValueKey('fullname'),
+                decoration: const InputDecoration(
+                  hintText: 'Enter Full Name',
+                ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please Enter Full Name';
+                  } else {
+                    return null;
+                  }
+                },
+                onSaved: (value) {
+                  setState(() {
+                    fullname = value!;
+                  });
+                },
+              ),
 
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CalculatorApp()),
-                );
-              },
-              icon: Icon(Icons.mail),
-              label: Text('Login via Email'),
-            ),
-          ],
+              // ======== Email ========
+              TextFormField(
+                key: const ValueKey('email'),
+                decoration: const InputDecoration(
+                  hintText: 'Enter Email',
+                ),
+                validator: (value) {
+                  if (value!.isEmpty || !value.contains('@')) {
+                    return 'Please Enter valid Email';
+                  } else {
+                    return null;
+                  }
+                },
+                onSaved: (value) {
+                  setState(() {
+                    email = value!;
+                  });
+                },
+              ),
+              // ======== Password ========
+              TextFormField(
+                key: const ValueKey('password'),
+                obscureText: true,
+                decoration: const InputDecoration(
+                  hintText: 'Enter Password',
+                ),
+                validator: (value) {
+                  if (value!.length < 6) {
+                    return 'Please Enter Password of min length 6';
+                  } else {
+                    return null;
+                  }
+                },
+                onSaved: (value) {
+                  setState(() {
+                    password = value!;
+                  });
+                },
+              ),
+              const SizedBox(
+                height: 30,
+              ),
+              Container(
+                height: 55,
+                width: double.infinity,
+                child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        login
+                            ? AuthServices.signinUser(email, password, context)
+                            : AuthServices.signupUser(
+                            email, password, fullname, context);
+                      }
+                    },
+                    child: Text(login ? 'Login' : 'Signup')),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      login = !login;
+                    });
+                  },
+                  child: Text(login
+                      ? "Don't have an account? Signup"
+                      : "Already have an account? Login"))
+            ],
+          ),
         ),
       ),
     );
