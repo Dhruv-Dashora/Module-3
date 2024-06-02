@@ -1,48 +1,41 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: file_names, unused_import, unused_local_variable, avoid_print
+
+import 'package:calculator/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:calculator/Firestore.dart';
+import 'package:flutter/widgets.dart';
 
-class AuthServices {
-  static signupUser(
-      String email, String password, String name, BuildContext context) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-      await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
-      await FirebaseAuth.instance.currentUser!.verifyBeforeUpdateEmail(email);
-      await FirestoreServices.saveUser(name, email, userCredential.user!.uid);
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Registration Successful')));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Password Provided is too weak')));
-      } else if (e.code == 'email-already-in-use') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Email Provided already Exists')));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+void createUser(email, password) async {
+  try {
+    final credentials = await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'weak-password') {
+      print('The password is too weak. Please choose a stronger password.');
+    } else {
+      print('User is not signed in');
     }
   }
+}
 
-  static signinUser(String email, String password, BuildContext context) async {
-    try {
-      await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('You are Logged in')));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No user Found with this Email')));
-      } else if (e.code == 'wrong-password') {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Password did not match')));
-      }
+Future<bool> signIn(BuildContext context, String email, String password) async {
+  try {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return true; // Login successful
+  } on FirebaseAuthException catch (e) {
+    // Handle errors and return false
+    if (e.code == 'user-not-found' || e.code == 'wrong-password') {
+      print('Invalid credentials.');
+      return false; // Login failed
+    } else {
+      print('Error signing in: ${e.message}');
+      return false; // Login failed
     }
   }
 }

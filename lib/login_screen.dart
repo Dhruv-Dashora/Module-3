@@ -1,129 +1,120 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, avoid_print, unused_element, use_build_context_synchronously, unnecessary_cast, unused_import
+
 import 'package:calculator/SignIn.dart';
+import 'package:calculator/main.dart';
+import 'package:flutter/material.dart';
+// import 'CalculatorApp.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
-
+class LoginScreen extends StatefulWidget {
   @override
-  State<LoginForm> createState() => _LoginFormState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>();
+class _LoginScreenState extends State<LoginScreen> {
+  TextEditingController emailController = TextEditingController();
 
-  String email = '';
-  String password = '';
-  String fullname = '';
-  bool login = false;
+  TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        title: const Text('Login'),
+        title: Text('Login'),
       ),
-      body: Form(
-        key: _formKey,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // ======== Full Name ========
-              login
-                  ? Container()
-                  : TextFormField(
-                key: const ValueKey('fullname'),
-                decoration: const InputDecoration(
-                  hintText: 'Enter Full Name',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please Enter Full Name';
-                  } else {
-                    return null;
-                  }
-                },
-                onSaved: (value) {
-                  setState(() {
-                    fullname = value!;
-                  });
-                },
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                hintText: 'Email',
+                border: InputBorder.none,
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
-
-              // ======== Email ========
-              TextFormField(
-                key: const ValueKey('email'),
-                decoration: const InputDecoration(
-                  hintText: 'Enter Email',
-                ),
-                validator: (value) {
-                  if (value!.isEmpty || !value.contains('@')) {
-                    return 'Please Enter valid Email';
-                  } else {
-                    return null;
-                  }
-                },
-                onSaved: (value) {
-                  setState(() {
-                    email = value!;
-                  });
-                },
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              // ======== Password ========
-              TextFormField(
-                key: const ValueKey('password'),
-                obscureText: true,
-                decoration: const InputDecoration(
-                  hintText: 'Enter Password',
-                ),
-                validator: (value) {
-                  if (value!.length < 6) {
-                    return 'Please Enter Password of min length 6';
-                  } else {
-                    return null;
-                  }
-                },
-                onSaved: (value) {
-                  setState(() {
-                    password = value!;
-                  });
-                },
+              onChanged: (value) {
+                setState(() {
+                  emailController.text = value;
+                });
+              },
+            ),
+            TextField(
+              controller: passwordController,
+              decoration: InputDecoration(
+                hintText: 'Password',
+                border: InputBorder.none,
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
-              const SizedBox(
-                height: 30,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-              Container(
-                height: 55,
-                width: double.infinity,
-                child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
-                        login
-                            ? AuthServices.signinUser(email, password, context)
-                            : AuthServices.signupUser(
-                            email, password, fullname, context);
-                      }
-                    },
-                    child: Text(login ? 'Login' : 'Signup')),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              TextButton(
-                  onPressed: () {
-                    setState(() {
-                      login = !login;
-                    });
-                  },
-                  child: Text(login
-                      ? "Don't have an account? Signup"
-                      : "Already have an account? Login"))
-            ],
-          ),
+              onChanged: (value) {
+                setState(() {
+                  passwordController.text = value;
+                });
+              },
+            ),
+            ElevatedButton.icon(
+              onPressed: () {
+                createUser(emailController.text, passwordController.text);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              icon: Icon(Icons.mail),
+              label: Text('SignUp'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                bool loginSuccessful = await signIn(
+                    context, emailController.text, passwordController.text);
+                if (loginSuccessful) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CalculatorApp()));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Invalid email or password. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              icon: Icon(Icons.mail),
+              label: Text('SignIn'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () async {
+                bool loginSuccessful = await signIn(
+                    context, emailController.text, passwordController.text);
+                if (loginSuccessful) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CalculatorApp()));
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Invalid email or password. Please try again.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              icon: Icon(Icons.mail),
+              label: Text('Login via Email'),
+            ),
+          ],
         ),
       ),
     );
