@@ -4,8 +4,6 @@ Continuing with our Flutter project in module 1,the app now initiates a login pr
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
 A few resources used for this Flutter project:
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
