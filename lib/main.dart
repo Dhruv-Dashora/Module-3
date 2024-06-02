@@ -1,6 +1,10 @@
+// ignore_for_file: unused_local_variable, prefer_final_fields
+
 import 'package:calculator/colors.dart';
 import 'package:calculator/firebase_options.dart';
 import 'package:calculator/login_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
@@ -32,6 +36,23 @@ class _CalculatorAppState extends State<CalculatorApp> {
   var operation = "";
   var hideInput = false;
   var outputSize = 34.0;
+  // Added variable to store calculation history (optional)
+  List<Map<String, String>> _calculationHistory = [];
+  void _saveCalculationHistory() {
+    if (input.isNotEmpty) {
+      // Add the current calculation to the history (optional)
+      _calculationHistory.add({'equation': input, 'result': output});
+
+      // Call the saveCalculationHistory function with current history (optional)
+      saveCalculationHistory(
+          _calculationHistory); // Uncomment if using _calculationHistory
+
+      // Clear the input and output for a new calculation
+      input = "";
+      output = "";
+      setState(() {});
+    }
+  }
 
   onButtonClick(value) {
     if (value == "AC") {
@@ -56,6 +77,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
         input = output;
         hideInput = true;
         outputSize = 52;
+        _calculationHistory.add({'equation': userInput, 'result': output});
       }
     } else {
       input = input + value;
@@ -63,6 +85,27 @@ class _CalculatorAppState extends State<CalculatorApp> {
       outputSize = 34;
     }
     setState(() {});
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final userId =
+          user.uid; // Use this userId in your saveCalculationHistory functions
+      // ... rest of your code ...
+    }
+  }
+
+  Future<void> saveCalculationHistory(List<Map<String, String>> history) async {
+    final FirebaseFirestore firestore = FirebaseFirestore.instance;
+    final userDocRef = firestore.collection('users').doc('userId');
+
+    // Limit history size (optional)
+    if (history.length > 10) {
+      history.removeRange(0, history.length - 10); // Keep the last 10 entries
+    }
+
+    // Update user document with the history
+    await userDocRef.update({
+      'calculationHistory': history,
+    });
   }
 
   @override
@@ -108,6 +151,8 @@ class _CalculatorAppState extends State<CalculatorApp> {
           //buttons area
           Row(
             children: [
+              button(
+                  text: "Save History", buttonBgColor: Colors.lightGreenAccent),
               button(text: "AC", buttonBgColor: operatorColor),
               button(text: "<", buttonBgColor: operatorColor),
               button(text: "", buttonBgColor: Colors.transparent),
@@ -159,7 +204,13 @@ class _CalculatorAppState extends State<CalculatorApp> {
           style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.all(22),
               backgroundColor: buttonBgColor),
-          onPressed: () => onButtonClick(text),
+          onPressed: () {
+            if (text == "Save History") {
+              _saveCalculationHistory();
+            } else {
+              onButtonClick(text);
+            }
+          },
           child: Text(
             text,
             style: TextStyle(
