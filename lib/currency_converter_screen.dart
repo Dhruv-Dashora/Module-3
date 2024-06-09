@@ -26,7 +26,8 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   // Function to fetch conversion rate
   Future<void> fetchConversionRate() async {
-    const apiKey = "YOUR_API_KEY"; // Replace with your ExchangeRate-API key
+    const apiKey =
+        "6f131f8aed1d29fb8dd3d202"; // Replace with your ExchangeRate-API key
     final url = Uri.parse(
         "https://v6.exchangerate-api.com/v6/$apiKey/pair/$fromCurrency/$toCurrency");
     final response = await http.get(url);
@@ -82,6 +83,39 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         value: "EUR",
                         child: Text("EUR"),
                       ),
+                      DropdownMenuItem(
+                        value: "INR",
+                        child: Text("INR"),
+                      ),
+                      DropdownMenuItem(
+                        value: "JPY",
+                        child: Text("JPY"),
+                      ),
+                      DropdownMenuItem(
+                        value: "CHF",
+                        child: Text("CHF"),
+                      ),
+                      DropdownMenuItem(
+                        value: "GBP",
+                        child: Text("GBP"),
+                      ),
+                      DropdownMenuItem(
+                        value: "AUD",
+                        child: Text("AUD"),
+                      ),
+                      DropdownMenuItem(
+                        value: "AED",
+                        child: Text("AED"),
+                      ),
+                      DropdownMenuItem(
+                        value: "SGD",
+                        child: Text("SGD"),
+                      ),
+                      DropdownMenuItem(
+                        value: "NOK",
+                        child: Text("NOK"),
+                      ),
+
                       // Add more currencies as needed
                     ],
                     onChanged: (value) => setState(() => fromCurrency = value!),
@@ -114,6 +148,39 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
                         value: "USD",
                         child: Text("USD"),
                       ),
+                      DropdownMenuItem(
+                        value: "INR",
+                        child: Text("INR"),
+                      ),
+                      DropdownMenuItem(
+                        value: "JPY",
+                        child: Text("JPY"),
+                      ),
+                      DropdownMenuItem(
+                        value: "CHF",
+                        child: Text("CHF"),
+                      ),
+                      DropdownMenuItem(
+                        value: "GBP",
+                        child: Text("GBP"),
+                      ),
+                      DropdownMenuItem(
+                        value: "AUD",
+                        child: Text("AUD"),
+                      ),
+                      DropdownMenuItem(
+                        value: "AED",
+                        child: Text("AED"),
+                      ),
+                      DropdownMenuItem(
+                        value: "SGD",
+                        child: Text("SGD"),
+                      ),
+                      DropdownMenuItem(
+                        value: "NOK",
+                        child: Text("NOK"),
+                      ),
+
                       // Add more currencies as needed
                     ],
                     onChanged: (value) => setState(() => toCurrency = value!),
