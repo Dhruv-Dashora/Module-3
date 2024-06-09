@@ -1,6 +1,7 @@
-// ignore_for_file: unused_local_variable, prefer_final_fields
+// ignore_for_file: unused_local_variable, prefer_final_fields, prefer_const_constructors, override_on_non_overriding_member, unused_element
 
 import 'package:calculator/colors.dart';
+import 'package:calculator/currency_converter_screen.dart';
 import 'package:calculator/firebase_options.dart';
 import 'package:calculator/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,6 +39,11 @@ class _CalculatorAppState extends State<CalculatorApp> {
   var outputSize = 34.0;
   // Added variable to store calculation history (optional)
   List<Map<String, String>> _calculationHistory = [];
+  void goToCurrencyConverter() {
+    Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => CurrencyConverterScreen()));
+  }
+
   void _saveCalculationHistory() {
     if (input.isNotEmpty) {
       // Add the current calculation to the history (optional)
@@ -54,7 +60,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
     }
   }
 
-  onButtonClick(value) {
+  void onButtonClick(value) {
     if (value == "AC") {
       input = "";
       output = "";
@@ -89,7 +95,6 @@ class _CalculatorAppState extends State<CalculatorApp> {
     if (user != null) {
       final userId =
           user.uid; // Use this userId in your saveCalculationHistory functions
-      // ... rest of your code ...
     }
   }
 
@@ -112,6 +117,10 @@ class _CalculatorAppState extends State<CalculatorApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+      floatingActionButton: FloatingActionButton(
+        onPressed: goToCurrencyConverter,
+        child: const Icon(Icons.attach_money),
+      ),
       body: Column(
         children: [
           //input output area
@@ -202,7 +211,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
         margin: const EdgeInsets.all(8),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(20),
               backgroundColor: buttonBgColor),
           onPressed: () {
             if (text == "Save History") {

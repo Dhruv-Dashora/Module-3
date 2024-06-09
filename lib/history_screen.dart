@@ -1,6 +1,7 @@
 // ignore_for_file: unused_import
 
 import 'package:calculator/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,8 +24,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   Future<void> _fetchCalculationHistory() async {
     final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final userDocRef =
-        firestore.collection('users').doc(/* your user ID here */);
+    final userDocRef = firestore
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser?.uid);
 
     final docSnapshot = await userDocRef.get();
     if (docSnapshot.exists) {
