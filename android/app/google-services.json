@@ -28,7 +28,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1032625658923:android:b16a727408a3ac2a2d5e6e",
         "android_client_info": {
-          "package_name": "com.example.calculator"
+          "package_name": "com.example.firebasesesh"
         }
       },
       "oauth_client": [],

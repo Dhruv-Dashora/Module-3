@@ -1,4 +1,4 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, avoid_print, unused_element, use_build_context_synchronously, unnecessary_cast, unused_import
+// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, avoid_print, unused_element, use_build_context_synchronously, unnecessary_cast, unused_import, no_leading_underscores_for_local_identifiers
 
 import 'package:calculator/SignIn.dart';
 import 'package:calculator/main.dart';
@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //bool _obscureText = true; // State variable to track password visibility
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
@@ -46,21 +47,31 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextField(
               controller: passwordController,
+              // Set obscureText to true to hide characters
+              // Set based on state variable
+              //obscureText: _obscureText,
               decoration: InputDecoration(
                 hintText: 'Password',
-                border: InputBorder.none,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
                 filled: true,
                 fillColor: Colors.grey[200],
+                // suffixIcon: IconButton(
+                //   icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+                //   onPressed: () {
+                //     setState(() {
+                //       _obscureText = !_obscureText;
+                //     });
+                //   },
+                // ),
               ),
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
-              onChanged: (value) {
-                setState(() {
-                  passwordController.text = value;
-                });
-              },
+              onChanged: (value) =>
+                  passwordController.text = value, // Concise arrow function
             ),
             ElevatedButton.icon(
               onPressed: () {

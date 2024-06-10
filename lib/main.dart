@@ -9,6 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:math_expressions/math_expressions.dart';
+import 'package:calculator/history_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -216,6 +217,11 @@ class _CalculatorAppState extends State<CalculatorApp> {
           onPressed: () {
             if (text == "Save History") {
               _saveCalculationHistory();
+              // Navigate to History Screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => HistoryScreen()),
+              );
             } else {
               onButtonClick(text);
             }
