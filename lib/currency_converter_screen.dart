@@ -26,8 +26,7 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   // Function to fetch conversion rate
   Future<void> fetchConversionRate() async {
-    const apiKey =
-        "6f131f8aed1d29fb8dd3d202"; // Replace with your ExchangeRate-API key
+    const apiKey = "**********"; // Replace with your ExchangeRate-API key
     final url = Uri.parse(
         "https://v6.exchangerate-api.com/v6/$apiKey/pair/$fromCurrency/$toCurrency");
     final response = await http.get(url);

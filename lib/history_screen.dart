@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:calculator/Firestore.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -15,6 +16,8 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   List<Map<String, String>> _calculationHistory = [];
+  // ignore: unused_field
+  final HistoryService _historyService = HistoryService(); // Create instance
 
   @override
   void initState() {
@@ -22,21 +25,13 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _fetchCalculationHistory();
   }
 
+  // HistoryScreen.dart
   Future<void> _fetchCalculationHistory() async {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final userDocRef = firestore
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser?.uid);
-
-    final docSnapshot = await userDocRef.get();
-    if (docSnapshot.exists) {
-      final historyData = docSnapshot.data()!['calculationHistory'];
-      if (historyData != null) {
-        setState(() {
-          _calculationHistory = List<Map<String, String>>.from(historyData);
-        });
-      }
-    }
+    final String uid = FirebaseAuth.instance.currentUser!.uid;
+    final history = await HistoryService().fetchCalculationHistory(uid);
+    setState(() {
+      _calculationHistory = history;
+    });
   }
 
   @override

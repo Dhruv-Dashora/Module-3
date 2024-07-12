@@ -47,14 +47,9 @@ class _CalculatorAppState extends State<CalculatorApp> {
 
   void _saveCalculationHistory() {
     if (input.isNotEmpty) {
-      // Add the current calculation to the history (optional)
       _calculationHistory.add({'equation': input, 'result': output});
-
-      // Call the saveCalculationHistory function with current history (optional)
       saveCalculationHistory(
-          _calculationHistory); // Uncomment if using _calculationHistory
-
-      // Clear the input and output for a new calculation
+          _calculationHistory); // Assuming this saves to Firestore
       input = "";
       output = "";
       setState(() {});
@@ -72,26 +67,32 @@ class _CalculatorAppState extends State<CalculatorApp> {
     } else if (value == "=") {
       if (input.isNotEmpty) {
         var userInput = input;
-        userInput = input.replaceAll("X", "*");
-        Parser p = Parser();
+        userInput = userInput.replaceAll("X", "*"); // Replace "X" with "*"
+        Parser p = Parser(); // Assuming this is for math expression parsing
+        String equation = userInput;
         Expression expression = p.parse(userInput);
         ContextModel cm = ContextModel();
         var finalValue = expression.evaluate(EvaluationType.REAL, cm);
         output = finalValue.toString();
         if (output.endsWith(".0")) {
-          output = output.substring(0, output.length - 2);
+          output =
+              output.substring(0, output.length - 2); // Remove trailing ".0"
         }
+        String result = output;
+        _calculationHistory.add({'equation': equation, 'result': result});
         input = output;
         hideInput = true;
         outputSize = 52;
-        _calculationHistory.add({'equation': userInput, 'result': output});
       }
     } else {
-      input = input + value;
+      // Handle other button values
+      input += value; // Append user input
       hideInput = false;
       outputSize = 34;
     }
     setState(() {});
+
+    // Get current user (moved outside button press logic)
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       final userId =

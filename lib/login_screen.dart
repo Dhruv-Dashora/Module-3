@@ -1,9 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, avoid_print, unused_element, use_build_context_synchronously, unnecessary_cast, unused_import, no_leading_underscores_for_local_identifiers
-
 import 'package:calculator/SignIn.dart';
 import 'package:calculator/main.dart';
 import 'package:flutter/material.dart';
-// import 'CalculatorApp.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
