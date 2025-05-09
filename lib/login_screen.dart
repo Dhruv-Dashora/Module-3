@@ -1,6 +1,8 @@
 import 'package:calculator/SignIn.dart';
 import 'package:calculator/main.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,6 +13,39 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool _obscureText = true;
+
+  // Initialize Google Sign-In
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  // Google Sign-In logic
+  Future<void> _googleSignIn() async {
+    try {
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      if (googleUser == null) {
+        // User canceled the sign-in process
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+      if (userCredential.user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => CalculatorApp()),
+        );
+      }
+    } catch (e) {
+      print('Google Sign-In failed: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,26 +150,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 20),
 
-              // Login via Email Button
+              // Google SignIn Button
               _buildElevatedButton(
-                onPressed: () async {
-                  bool loginSuccessful = await signIn(
-                      context, emailController.text, passwordController.text);
-                  if (loginSuccessful) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CalculatorApp()));
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            'Invalid email or password. Please try again.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
+                onPressed: _googleSignIn, // Call Google sign-in function
                 label: 'Sign-in with Google',
                 icon: Icons.mail_outline,
                 color: Colors.white,
@@ -192,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
         icon: Icon(icon),
         label: Text(label),
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white,
+          backgroundColor: color,
           minimumSize: Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
