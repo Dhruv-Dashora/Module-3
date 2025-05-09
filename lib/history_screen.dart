@@ -1,11 +1,7 @@
-// ignore_for_file: unused_import
-
 import 'package:calculator/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:calculator/Firestore.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -16,8 +12,7 @@ class HistoryScreen extends StatefulWidget {
 
 class _HistoryScreenState extends State<HistoryScreen> {
   List<Map<String, String>> _calculationHistory = [];
-  // ignore: unused_field
-  final HistoryService _historyService = HistoryService(); // Create instance
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -25,13 +20,38 @@ class _HistoryScreenState extends State<HistoryScreen> {
     _fetchCalculationHistory();
   }
 
-  // HistoryScreen.dart
   Future<void> _fetchCalculationHistory() async {
-    final String uid = FirebaseAuth.instance.currentUser!.uid;
-    final history = await HistoryService().fetchCalculationHistory(uid);
-    setState(() {
-      _calculationHistory = history;
-    });
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final userDocRef =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    try {
+      final doc = await userDocRef.get();
+      final data = doc.data();
+
+      if (data != null && data['calcHistory'] != null) {
+        final List<dynamic> rawHistory = data['calcHistory'];
+
+        final history = rawHistory.map((item) {
+          return {
+            'equation': item['equation']?.toString() ?? '',
+            'result': item['result']?.toString() ?? '',
+          };
+        }).toList();
+
+        setState(() {
+          _calculationHistory = List<Map<String, String>>.from(history);
+          _isLoading = false;
+        });
+      } else {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      print('Error fetching calculation history: $e');
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -41,16 +61,20 @@ class _HistoryScreenState extends State<HistoryScreen> {
         title: const Text('Calculation History'),
         backgroundColor: operatorColor,
       ),
-      body: ListView.builder(
-        itemCount: _calculationHistory.length,
-        itemBuilder: (context, index) {
-          final historyItem = _calculationHistory[index];
-          return ListTile(
-            title: Text(historyItem['equation']!),
-            subtitle: Text(historyItem['result']!),
-          );
-        },
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _calculationHistory.isEmpty
+              ? const Center(child: Text("No history found"))
+              : ListView.builder(
+                  itemCount: _calculationHistory.length,
+                  itemBuilder: (context, index) {
+                    final history = _calculationHistory[index];
+                    return ListTile(
+                      title: Text(history['equation'] ?? ''),
+                      subtitle: Text("= ${history['result'] ?? ''}"),
+                    );
+                  },
+                ),
     );
   }
 }

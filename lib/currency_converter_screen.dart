@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print, unused_local_variable
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -56,154 +54,127 @@ class _CurrencyConverterScreenState extends State<CurrencyConverterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Currency Converter'),
+        title: const Text(
+          'Currency Converter',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Input Section
+            SizedBox(height: 0.05 * screenHeight),
+
+            // Dropdown + TextField
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                SizedBox(
-                  width: 350.0,
-                  height: 350.0,
-                  child: DropdownButton<String>(
-                    value: fromCurrency,
-                    items: const [
-                      DropdownMenuItem(
-                        value: "USD",
-                        child: Text("USD"),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const Text("From"),
+                      DropdownButton<String>(
+                        value: fromCurrency,
+                        isExpanded: true,
+                        items: _buildCurrencyDropdownItems(),
+                        onChanged: (value) =>
+                            setState(() => fromCurrency = value!),
                       ),
-                      DropdownMenuItem(
-                        value: "EUR",
-                        child: Text("EUR"),
-                      ),
-                      DropdownMenuItem(
-                        value: "INR",
-                        child: Text("INR"),
-                      ),
-                      DropdownMenuItem(
-                        value: "JPY",
-                        child: Text("JPY"),
-                      ),
-                      DropdownMenuItem(
-                        value: "CHF",
-                        child: Text("CHF"),
-                      ),
-                      DropdownMenuItem(
-                        value: "GBP",
-                        child: Text("GBP"),
-                      ),
-                      DropdownMenuItem(
-                        value: "AUD",
-                        child: Text("AUD"),
-                      ),
-                      DropdownMenuItem(
-                        value: "AED",
-                        child: Text("AED"),
-                      ),
-                      DropdownMenuItem(
-                        value: "SGD",
-                        child: Text("SGD"),
-                      ),
-                      DropdownMenuItem(
-                        value: "NOK",
-                        child: Text("NOK"),
-                      ),
-
-                      // Add more currencies as needed
                     ],
-                    onChanged: (value) => setState(() => fromCurrency = value!),
                   ),
                 ),
-                SizedBox(
-                  width: 350.0,
-                  height: 350.0,
-                  child: TextField(
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: "Enter amount",
-                    ),
-                    onChanged: (value) {
-                      amount = double.tryParse(value) ?? 0.0;
-                    },
+                SizedBox(width: 0.05 * screenWidth),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const Text("Amount"),
+                      TextField(
+                        keyboardType: TextInputType.number,
+                        decoration:
+                            const InputDecoration(hintText: "Enter amount"),
+                        onChanged: (value) {
+                          amount = double.tryParse(value) ?? 0.0;
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(
-                  width: 350.0,
-                  height: 350.0,
-                  child: DropdownButton<String>(
-                    value: toCurrency,
-                    items: const [
-                      DropdownMenuItem(
-                        value: "EUR",
-                        child: Text("EUR"),
+                SizedBox(width: 0.05 * screenWidth),
+                Expanded(
+                  child: Column(
+                    children: [
+                      const Text("To"),
+                      DropdownButton<String>(
+                        value: toCurrency,
+                        isExpanded: true,
+                        items: _buildCurrencyDropdownItems(),
+                        onChanged: (value) =>
+                            setState(() => toCurrency = value!),
                       ),
-                      DropdownMenuItem(
-                        value: "USD",
-                        child: Text("USD"),
-                      ),
-                      DropdownMenuItem(
-                        value: "INR",
-                        child: Text("INR"),
-                      ),
-                      DropdownMenuItem(
-                        value: "JPY",
-                        child: Text("JPY"),
-                      ),
-                      DropdownMenuItem(
-                        value: "CHF",
-                        child: Text("CHF"),
-                      ),
-                      DropdownMenuItem(
-                        value: "GBP",
-                        child: Text("GBP"),
-                      ),
-                      DropdownMenuItem(
-                        value: "AUD",
-                        child: Text("AUD"),
-                      ),
-                      DropdownMenuItem(
-                        value: "AED",
-                        child: Text("AED"),
-                      ),
-                      DropdownMenuItem(
-                        value: "SGD",
-                        child: Text("SGD"),
-                      ),
-                      DropdownMenuItem(
-                        value: "NOK",
-                        child: Text("NOK"),
-                      ),
-
-                      // Add more currencies as needed
                     ],
-                    onChanged: (value) => setState(() => toCurrency = value!),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 25.0, width: 25.0),
-            ElevatedButton(
-              onPressed: () async {
-                await fetchConversionRate();
-                convertCurrency();
-              },
-              child: const Text("Convert"),
+
+            SizedBox(height: 0.1 * screenHeight),
+
+            // Convert Button
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                ),
+                onPressed: () async {
+                  await fetchConversionRate();
+                  convertCurrency();
+                },
+                child: const Text("Convert"),
+              ),
             ),
-            const SizedBox(height: 25.0, width: 25.0),
-            // Output Section
-            Text(
-              "Converted amount: ${amount * conversionRate} $toCurrency", // Update with converted amount
-              style: const TextStyle(fontSize: 16.0),
+
+            SizedBox(height: 0.05 * screenHeight),
+
+            // Result
+            Center(
+              child: Text(
+                convertedAmount.isNotEmpty
+                    ? "Converted amount: $convertedAmount $toCurrency"
+                    : "Converted amount: ${amount * conversionRate} $toCurrency",
+                style: const TextStyle(fontSize: 18),
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  List<DropdownMenuItem<String>> _buildCurrencyDropdownItems() {
+    const currencies = [
+      "USD",
+      "EUR",
+      "INR",
+      "JPY",
+      "CHF",
+      "GBP",
+      "AUD",
+      "AED",
+      "SGD",
+      "NOK"
+    ];
+    return currencies
+        .map((code) => DropdownMenuItem(value: code, child: Text(code)))
+        .toList();
   }
 }

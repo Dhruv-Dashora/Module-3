@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable, prefer_final_fields, prefer_const_constructors, override_on_non_overriding_member, unused_element
-
 import 'package:calculator/colors.dart';
 import 'package:calculator/currency_converter_screen.dart';
 import 'package:calculator/firebase_options.dart';
@@ -19,6 +17,7 @@ void main() async {
 
   runApp(MaterialApp(
     home: LoginScreen(),
+    debugShowCheckedModeBanner: false,
   ));
 }
 
@@ -39,15 +38,14 @@ class _CalculatorAppState extends State<CalculatorApp> {
   var hideInput = false;
   var outputSize = 34.0;
   // Added variable to store calculation history (optional)
-  List<Map<String, String>> _calculationHistory = [];
+  final List<Map<String, String>> _calculationHistory = [];
   void goToCurrencyConverter() {
-    Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => CurrencyConverterScreen()));
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => const CurrencyConverterScreen()));
   }
 
   void _saveCalculationHistory() {
     if (input.isNotEmpty) {
-      _calculationHistory.add({'equation': input, 'result': output});
       saveCalculationHistory(
           _calculationHistory); // Assuming this saves to Firestore
       input = "";
@@ -101,22 +99,25 @@ class _CalculatorAppState extends State<CalculatorApp> {
   }
 
   Future<void> saveCalculationHistory(List<Map<String, String>> history) async {
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
-    final userDocRef = firestore.collection('users').doc('userId');
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
 
-    // Limit history size (optional)
+    final userDocRef =
+        FirebaseFirestore.instance.collection('users').doc(user.uid);
+
     if (history.length > 10) {
-      history.removeRange(0, history.length - 10); // Keep the last 10 entries
+      history.removeRange(0, history.length - 10); // Keep last 10
     }
 
-    // Update user document with the history
-    await userDocRef.update({
-      'calculationHistory': history,
-    });
+    await userDocRef.set({
+      'calcHistory': history,
+    }, SetOptions(merge: true));
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.black,
       floatingActionButton: FloatingActionButton(
@@ -126,36 +127,34 @@ class _CalculatorAppState extends State<CalculatorApp> {
       body: Column(
         children: [
           //input output area
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    hideInput ? "" : input,
-                    style: const TextStyle(
-                      fontSize: 48,
-                      color: Colors.white,
-                    ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  hideInput ? "" : input,
+                  style: const TextStyle(
+                    fontSize: 48,
+                    color: Colors.white,
                   ),
-                  const SizedBox(
-                    height: 20,
+                ),
+                SizedBox(
+                  height: 0.1 * screenHeight,
+                ),
+                Text(
+                  output,
+                  style: TextStyle(
+                    fontSize: outputSize,
+                    color: Colors.lightGreenAccent,
                   ),
-                  Text(
-                    output,
-                    style: TextStyle(
-                      fontSize: outputSize,
-                      color: Colors.lightGreenAccent,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                ],
-              ),
+                ),
+                SizedBox(
+                  height: 0.1 * screenHeight,
+                ),
+              ],
             ),
           ),
 
@@ -164,9 +163,13 @@ class _CalculatorAppState extends State<CalculatorApp> {
             children: [
               button(
                   text: "Save History", buttonBgColor: Colors.lightGreenAccent),
+            ],
+          ),
+          Row(
+            children: [
               button(text: "AC", buttonBgColor: operatorColor),
               button(text: "<", buttonBgColor: operatorColor),
-              button(text: "", buttonBgColor: Colors.transparent),
+              button(text: "()", buttonBgColor: operatorColor),
               button(text: "/", buttonBgColor: operatorColor),
             ],
           ),
@@ -213,7 +216,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
         margin: const EdgeInsets.all(8),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(12),
               backgroundColor: buttonBgColor),
           onPressed: () {
             if (text == "Save History") {
@@ -221,7 +224,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
               // Navigate to History Screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => HistoryScreen()),
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
               );
             } else {
               onButtonClick(text);

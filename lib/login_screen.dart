@@ -1,8 +1,6 @@
-// ignore_for_file: use_key_in_widget_constructors, prefer_const_constructors, avoid_print, unused_element, use_build_context_synchronously, unnecessary_cast, unused_import, no_leading_underscores_for_local_identifiers
 import 'package:calculator/SignIn.dart';
 import 'package:calculator/main.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -11,119 +9,195 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
-
   TextEditingController passwordController = TextEditingController();
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-    //bool _obscureText = true; // State variable to track password visibility
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        backgroundColor: Colors.white,
+        title: const Text(
+          'Login',
+          style: TextStyle(
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                hintText: 'Email',
-                border: InputBorder.none,
-                filled: true,
-                fillColor: Colors.grey[200],
-              ),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-              onChanged: (value) {
-                setState(() {
-                  emailController.text = value;
-                });
-              },
-            ),
-            TextField(
-              controller: passwordController,
-              // Set obscureText to true to hide characters
-              // Set based on state variable
-              //obscureText: _obscureText,
-              decoration: InputDecoration(
-                hintText: 'Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+      backgroundColor: Colors.black,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 40),
+              // Logo or Heading (Optional)
+              const Text(
+                'Welcome Back!',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
-                filled: true,
-                fillColor: Colors.grey[200],
-                // suffixIcon: IconButton(
-                //   icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
-                //   onPressed: () {
-                //     setState(() {
-                //       _obscureText = !_obscureText;
-                //     });
-                //   },
-                // ),
               ),
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 40),
+
+              // Email TextField
+              _buildTextField(
+                controller: emailController,
+                hintText: 'Enter your email',
+                keyboardType: TextInputType.emailAddress,
+                icon: Icons.email,
               ),
-              onChanged: (value) =>
-                  passwordController.text = value, // Concise arrow function
-            ),
-            ElevatedButton.icon(
-              onPressed: () {
-                createUser(emailController.text, passwordController.text);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
-              },
-              icon: Icon(Icons.mail),
-              label: Text('SignUp'),
-            ),
-            ElevatedButton.icon(
-              onPressed: () async {
-                bool loginSuccessful = await signIn(
-                    context, emailController.text, passwordController.text);
-                if (loginSuccessful) {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CalculatorApp()));
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text('Invalid email or password. Please try again.'),
-                      backgroundColor: Colors.red,
-                    ),
+
+              // Password TextField
+              _buildTextField(
+                controller: passwordController,
+                hintText: 'Enter your password',
+                keyboardType: TextInputType.text,
+                icon: Icons.lock,
+                obscureText: _obscureText,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                      _obscureText ? Icons.visibility_off : Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _obscureText = !_obscureText;
+                    });
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // SignUp Button
+              _buildElevatedButton(
+                onPressed: () {
+                  createUser(emailController.text, passwordController.text);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
                   );
-                }
-              },
-              icon: Icon(Icons.mail),
-              label: Text('SignIn'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton.icon(
-              onPressed: () async {
-                bool loginSuccessful = await signIn(
-                    context, emailController.text, passwordController.text);
-                if (loginSuccessful) {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CalculatorApp()));
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text('Invalid email or password. Please try again.'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              icon: Icon(Icons.mail),
-              label: Text('Login via Email'),
-            ),
-          ],
+                },
+                label: 'SignUp',
+                icon: Icons.mail,
+                color: Colors.white,
+              ),
+
+              // SignIn Button
+              _buildElevatedButton(
+                onPressed: () async {
+                  bool loginSuccessful = await signIn(
+                      context, emailController.text, passwordController.text);
+                  if (loginSuccessful) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CalculatorApp()));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Invalid email or password. Please try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                label: 'SignIn',
+                icon: Icons.login,
+                color: Colors.white,
+              ),
+
+              const SizedBox(height: 20),
+
+              // Login via Email Button
+              _buildElevatedButton(
+                onPressed: () async {
+                  bool loginSuccessful = await signIn(
+                      context, emailController.text, passwordController.text);
+                  if (loginSuccessful) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CalculatorApp()));
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            'Invalid email or password. Please try again.'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+                label: 'Sign-in with Google',
+                icon: Icons.mail_outline,
+                color: Colors.white,
+              ),
+
+              const SizedBox(height: 40),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Custom text field widget for better reusability
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required TextInputType keyboardType,
+    required IconData icon,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          prefixIcon: Icon(icon, color: Colors.black),
+          hintText: hintText,
+          border: InputBorder.none,
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
+  }
+
+  // Custom ElevatedButton with icon and color for better reusability
+  Widget _buildElevatedButton({
+    required VoidCallback onPressed,
+    required String label,
+    required IconData icon,
+    required Color color,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon),
+        label: Text(label),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          minimumSize: Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          textStyle: const TextStyle(fontSize: 19),
         ),
       ),
     );

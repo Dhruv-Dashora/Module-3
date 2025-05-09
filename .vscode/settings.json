@@ -1,4 +1,5 @@
 {
     "cmake.configureOnOpen": true,
-    "cmake.sourceDirectory": "C:/Users/admin/Desktop/Module1-main/linux"
+    "cmake.sourceDirectory": "C:/Users/admin/Desktop/Module1-main/linux",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

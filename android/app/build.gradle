@@ -1,10 +1,8 @@
-plugins{
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'com.google.gms.google-services'
-    id 'dev.flutter.flutter-gradle-plugin'
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
 }
-
 
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
@@ -23,8 +21,6 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName')
 if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
-
-
 
 android {
     namespace "com.example.calculator"
@@ -49,12 +45,10 @@ android {
         applicationId "com.example.calculator"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        multiDexEnabled true
-
     }
 
     buildTypes {
@@ -70,8 +64,4 @@ flutter {
     source '../..'
 }
 
-dependencies {
-    implementation 'com.google.firebase:firebase-bom:32.7.1'
-}
-
-
+dependencies {}
