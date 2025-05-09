@@ -5,7 +5,10 @@ Further, in module 3 we added a currency converter screen where using the http p
 Use Test user to login- email:test123 at gmail.com, password:flutter.
 Further issues which will be resolved:
 1.Previous calculations are not being stored as there is some issue with firestore.
-2.Realtime user auth is not availalable yet, because of issue in rules in firesttore.
+2.Realtime user auth [gAuth]is not availalable yet, because of issue in rules in firesttore.
+Update:
+Now user's last 10 calculations are being stored.
+Google Auth is also available now.
 ## Getting Started
 
 A few resources used for this Flutter project:
